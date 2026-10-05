@@ -111,7 +111,7 @@ export function Scheduler() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
-        <section className="border-2 p-4" style={card}>
+        <section className="self-start border-2 p-4" style={card}>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold">{dayLabel(days[0])} to {dayLabel(days[4])}</h2>
             <div className="flex gap-2">
