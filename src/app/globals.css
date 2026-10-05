@@ -1,34 +1,49 @@
 @import "tailwindcss";
 
 :root {
-  --bg: #f3f7f7;
+  --bg: #f4f6f3;
   --card: #ffffff;
-  --ink: #10201f;
-  --muted: #5a6b6a;
-  --line: #d9e3e2;
-  --brand: #0d7a6f;
+  --ink: #1c2a33;
+  --muted: #566670;
+  --line: #cdd6d3;
+  --brand: #1e5aa8;
+  --booked: #dce6f2;
+  --past: #eaeeeb;
+  --free-hover: #e7eef7;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0c1413;
-    --card: #142120;
-    --ink: #e5f0ef;
-    --muted: #8aa09e;
-    --line: #243736;
-    --brand: #2dd4bf;
+    --bg: #0f1619;
+    --card: #162025;
+    --ink: #e6eef0;
+    --muted: #8fa3ab;
+    --line: #2a3a40;
+    --brand: #5b9bea;
+    --booked: #1f3550;
+    --past: #131c20;
+    --free-hover: #1b2d3d;
   }
 }
 
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-family: var(--font-body), system-ui, sans-serif;
+}
+
+h1,
+h2 {
+  font-family: var(--font-display), Georgia, serif;
+}
+
+.slot-free:hover {
+  background: var(--free-hover);
 }
 
 button:focus-visible,
 input:focus-visible,
 select:focus-visible {
-  outline: 2px solid var(--brand);
+  outline: 3px solid var(--brand);
   outline-offset: 2px;
 }

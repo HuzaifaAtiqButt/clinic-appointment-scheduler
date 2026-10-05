@@ -12,7 +12,7 @@ const subscribeNow = (cb: () => void) => {
 const nowSnapshot = () => Math.floor(Date.now() / 60000) * 60000;
 const nowServer = () => 0;
 
-const card = { background: "var(--card)", borderColor: "var(--line)" };
+const card = { background: "var(--card)", borderColor: "var(--ink)" };
 const muted = { color: "var(--muted)" };
 
 export function Scheduler() {
@@ -74,7 +74,7 @@ export function Scheduler() {
   return (
     <div>
       <div className="flex flex-wrap items-center gap-3">
-        <div role="group" aria-label="Clinic" className="flex rounded-lg border p-1" style={card}>
+        <div role="group" aria-label="Clinic" className="flex gap-6 border-b-2" style={{ borderColor: "var(--ink)" }}>
           {CLINICS.map((c) => (
             <button
               key={c.id}
@@ -85,8 +85,8 @@ export function Scheduler() {
                 setSlot(null);
                 setDone("");
               }}
-              className="rounded-md px-3 py-1.5 text-sm"
-              style={c.id === clinic.id ? { background: "var(--brand)", color: "#fff" } : undefined}
+              className="-mb-[2px] border-b-4 py-2 text-base font-semibold"
+              style={{ borderColor: c.id === clinic.id ? "var(--brand)" : "transparent", color: c.id === clinic.id ? "var(--ink)" : "var(--muted)" }}
             >
               {c.name}
             </button>
@@ -100,7 +100,7 @@ export function Scheduler() {
               setProviderId(e.target.value);
               setSlot(null);
             }}
-            className="rounded-lg border bg-transparent px-2 py-2"
+            className="rounded-sm border bg-transparent px-2 py-2"
             style={{ borderColor: "var(--line)" }}
           >
             {clinic.providers.map((p) => (
@@ -111,56 +111,64 @@ export function Scheduler() {
       </div>
 
       <div className="mt-6 grid gap-6 lg:grid-cols-[1fr_340px]">
-        <section className="rounded-xl border p-4" style={card}>
+        <section className="border-2 p-4" style={card}>
           <div className="mb-3 flex items-center justify-between">
             <h2 className="font-semibold">{dayLabel(days[0])} to {dayLabel(days[4])}</h2>
             <div className="flex gap-2">
-              <button onClick={() => setWeekOffset((w) => Math.max(0, w - 1))} disabled={weekOffset === 0} className="rounded-md border px-3 py-1.5 text-sm disabled:opacity-40" style={{ borderColor: "var(--line)" }} aria-label="Previous week">Prev</button>
-              <button onClick={() => setWeekOffset((w) => Math.min(3, w + 1))} disabled={weekOffset === 3} className="rounded-md border px-3 py-1.5 text-sm disabled:opacity-40" style={{ borderColor: "var(--line)" }} aria-label="Next week">Next</button>
+              <button onClick={() => setWeekOffset((w) => Math.max(0, w - 1))} disabled={weekOffset === 0} className="rounded-sm border px-3 py-1.5 text-sm disabled:opacity-40" style={{ borderColor: "var(--line)" }} aria-label="Previous week">Prev</button>
+              <button onClick={() => setWeekOffset((w) => Math.min(3, w + 1))} disabled={weekOffset === 3} className="rounded-sm border px-3 py-1.5 text-sm disabled:opacity-40" style={{ borderColor: "var(--line)" }} aria-label="Next week">Next</button>
             </div>
           </div>
           <div className="overflow-x-auto">
-            <div className="grid min-w-[560px] grid-cols-5 gap-2">
+            <div className="grid min-w-[600px]" style={{ gridTemplateColumns: "52px repeat(5, minmax(0, 1fr))" }}>
+              <div />
               {days.map((d) => (
-                <div key={iso(d)}>
-                  <p className="mb-2 text-center text-xs font-medium" style={muted}>{dayLabel(d)}</p>
-                  <div className="space-y-1.5">
-                    {TIMES.map((t) => {
-                      const key = `${iso(d)}|${t}`;
-                      const taken = booked.has(key);
-                      const past = isPast(iso(d), t, now);
-                      const selected = slot?.date === iso(d) && slot.time === t;
-                      return (
-                        <button
-                          key={t}
-                          disabled={taken || past}
-                          onClick={() => pick(iso(d), t)}
-                          aria-label={`${dayLabel(d)} ${t}${taken ? ", booked" : past ? ", unavailable" : ", available"}`}
-                          aria-pressed={selected}
-                          className="w-full rounded-md border px-1 py-1.5 text-xs disabled:cursor-not-allowed"
-                          style={
-                            selected
-                              ? { background: "var(--brand)", borderColor: "var(--brand)", color: "#fff" }
-                              : taken
-                                ? { background: "var(--line)", borderColor: "var(--line)", color: "var(--muted)" }
-                                : past
-                                  ? { opacity: 0.35, borderColor: "var(--line)" }
-                                  : { borderColor: "var(--line)" }
-                          }
-                        >
-                          {taken ? "Booked" : t}
-                        </button>
-                      );
-                    })}
-                  </div>
+                <p key={iso(d)} className="border-b-2 pb-2 text-center text-sm font-semibold" style={{ borderColor: "var(--ink)" }}>
+                  {dayLabel(d)}
+                </p>
+              ))}
+              {TIMES.map((t) => (
+                <div key={t} className="contents">
+                  <p className="border-b pr-2 pt-1.5 text-right text-xs tabular-nums" style={{ borderColor: "var(--line)", color: "var(--muted)" }}>
+                    {t}
+                  </p>
+                  {days.map((d) => {
+                    const key = `${iso(d)}|${t}`;
+                    const appt = booked.get(key);
+                    const taken = !!appt;
+                    const past = isPast(iso(d), t, now);
+                    const selected = slot?.date === iso(d) && slot.time === t;
+                    return (
+                      <button
+                        key={key}
+                        disabled={taken || past}
+                        onClick={() => pick(iso(d), t)}
+                        aria-label={`${dayLabel(d)} ${t}${taken ? ", booked" : past ? ", unavailable" : ", available"}`}
+                        aria-pressed={selected}
+                        className={`slot h-8 border-b border-l text-xs font-semibold disabled:cursor-not-allowed ${!taken && !past ? "slot-free" : ""}`}
+                        style={
+                          selected
+                            ? { background: "var(--brand)", borderColor: "var(--line)", color: "#fff" }
+                            : taken
+                              ? { background: "var(--booked)", borderColor: "var(--line)", color: "var(--ink)" }
+                              : past
+                                ? { background: "var(--past)", borderColor: "var(--line)" }
+                                : { borderColor: "var(--line)" }
+                        }
+                      >
+                        {selected ? "Picked" : appt ? appt.patient.split(" ").map((w) => w[0]).join("") : ""}
+                      </button>
+                    );
+                  })}
                 </div>
               ))}
             </div>
           </div>
+          <p className="mt-3 text-xs" style={muted}>Empty cells are free. Letters show who is booked. Shaded cells have passed.</p>
         </section>
 
         <aside className="space-y-6">
-          <form onSubmit={submit} className="rounded-xl border p-5" style={card}>
+          <form onSubmit={submit} className="border-2 p-5" style={card}>
             <h2 className="font-semibold">Book a visit</h2>
             {slot ? (
               <p className="mt-1 text-sm" style={muted}>{longLabel(slot.date, slot.time)} with {provider.name}</p>
@@ -175,7 +183,7 @@ export function Scheduler() {
                 maxLength={60}
                 disabled={!slot}
                 placeholder="For example Alex Morgan"
-                className="mt-1 w-full rounded-lg border bg-transparent px-3 py-2 disabled:opacity-50"
+                className="mt-1 w-full rounded-sm border bg-transparent px-3 py-2 disabled:opacity-50"
                 style={{ borderColor: "var(--line)" }}
               />
             </label>
@@ -185,7 +193,7 @@ export function Scheduler() {
                 value={reasonValue}
                 onChange={(e) => setReason(e.target.value)}
                 disabled={!slot}
-                className="mt-1 w-full rounded-lg border bg-transparent px-3 py-2 disabled:opacity-50"
+                className="mt-1 w-full rounded-sm border bg-transparent px-3 py-2 disabled:opacity-50"
                 style={{ borderColor: "var(--line)" }}
               >
                 {clinic.reasons.map((r) => <option key={r}>{r}</option>)}
@@ -194,7 +202,7 @@ export function Scheduler() {
             <button
               type="submit"
               disabled={!slot}
-              className="mt-4 w-full rounded-lg px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
+              className="mt-4 w-full rounded-sm px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-50"
               style={{ background: "var(--brand)" }}
             >
               Confirm booking
@@ -204,7 +212,7 @@ export function Scheduler() {
             </p>
           </form>
 
-          <div className="rounded-xl border p-5" style={card}>
+          <div className="border-2 p-5" style={card}>
             <h2 className="font-semibold">Upcoming visits</h2>
             {upcoming.length === 0 ? (
               <p className="mt-2 text-sm" style={muted}>No upcoming visits.</p>
@@ -224,7 +232,7 @@ export function Scheduler() {
             )}
           </div>
 
-          <div className="rounded-xl border p-5" style={card}>
+          <div className="border-2 p-5" style={card}>
             <h2 className="font-semibold">Message log</h2>
             <p className="mt-1 text-xs" style={muted}>Messages are listed here, not sent to anyone.</p>
             {cs.reminders.length === 0 ? (

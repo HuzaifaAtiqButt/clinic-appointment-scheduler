@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Source_Sans_3, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+const display = Source_Serif_4({ variable: "--font-display", subsets: ["latin"] });
+const body = Source_Sans_3({ variable: "--font-body", subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "Clinic Appointment Scheduler",
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} antialiased`}>
+    <html lang="en" className={`${display.variable} ${body.variable} antialiased`}>
       <body>{children}</body>
     </html>
   );
